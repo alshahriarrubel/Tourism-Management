@@ -1,0 +1,131 @@
+create table users
+( user_id number primary key, user_name varchar2(30), 
+password varchar2(30));
+
+
+create table weather 
+( weather_id number primary key, min_temp number ,
+max_temp number, min_rainfall number, max_rainfall number, weather_region varchar2(30));
+
+create table place 
+( place_id number primary key, place_name varchar2(30), Address varchar2(200),
+latitude varchar2(30), longitude varchar2(30), category varchar2(30), weather_id number, 
+description varchar2(200), foreign key (weather_id) references weather);
+
+
+
+create table accomodation
+( acco_id number primary key, acco_name varchar2(30), 
+type varchar2(30), location varchar2(200), min_cost number, 
+max_cost number,  offers varchar2(200), phone varchar2(100), email varchar2(50), website varchar2(50));
+
+
+
+create table restaurant 
+( res_id number primary key, res_name varchar2(30), location varchar2(100), 
+phone varchar2(100), email varchar2(50), website varchar2(50), description  varchar2( 200));
+
+create table shopping_mall
+( sp_id number primary key, sp_name varchar2(30), category varchar2(30),
+location varchar2(200));
+
+
+create table emergency 
+( emr_id  number primary key, emr_name varchar2(50),
+emr_type varchar2(30), address varchar2(200),phone varchar2(100), email varchar2(50), website varchar2(50));
+
+
+create table Transportation
+( tran_id number primary key, tran_name varchar2(30),
+category varchar2(30), area varchar2(100), 
+phone varchar2(100), email varchar2(50), website varchar2(50));
+
+
+
+
+
+
+create table place_acco
+( place_id number, acco_id number, 
+foreign key (place_id) references place ,
+ foreign key ( acco_id) references accomodation); 
+
+
+create table  place_res 
+( place_id number, res_id number, 
+foreign key(place_id) references place,
+ foreign key (res_id) references restaurant);
+
+
+create table place_emr
+(  place_id number, emr_id number, 
+foreign key(place_id) references place,
+ foreign key (emr_id) references emergency);
+
+
+create table  place_tran
+(  place_id number, tran_id number, 
+foreign key(place_id) references place,
+ foreign key (tran_id) references transportation);
+
+
+create table  place_sp
+(  place_id number, sp_id number, 
+foreign key(place_id) references place,
+ foreign key (sp_id) references shopping_mall);
+
+
+create table project_users
+( u_id number primary key, u_name varchar2(30), 
+u_password varchar2(30),
+u_phone varchar2(20), u_email varchar2(30),
+); 
+
+
+create table photo
+(photo_id number primary key, place_id number, 
+image blob, filename varchar2(255), 
+mimetype varchar2(255),last_update_date date, 
+foreign key(place_id ) references place
+);
+
+create table booking
+( booking_id number primary key, u_id number, acco_id number, booking_date date,
+foreign key(u_id ) references project_users,
+foreign key(acco_id ) references accomodation
+);
+
+create table temp
+( key number primary key, place_id number,
+foreign key (place_id) references place);
+
+create sequence project_seq start with 10001 increment by 1;
+
+
+
+
+CREATE OR REPLACE FUNCTION project_auth 
+(
+p_username IN VARCHAR2,
+    p_password IN VARCHAR2)
+
+RETURN BOOLEAN IS
+BEGIN
+  FOR c1 IN 
+(SELECT 1 
+              FROM project_users
+   
+          WHERE upper(u_name) = upper(p_username)
+  
+             AND upper(u_password) = upper(p_password))
+
+  LOOP
+    RETURN TRUE;
+  
+END LOOP;
+ 
+ RETURN FALSE;
+
+END;
+
+/
